@@ -118,8 +118,19 @@ async function getBase64Image(img) {
     }
 }
 
+// Función para esperar a que las fuentes se carguen
+function waitForFonts() {
+    return new Promise((resolve) => {
+        if (document.fonts.status === 'loaded') {
+            resolve();
+        } else {
+            document.fonts.ready.then(resolve);
+        }
+    });
+}
+
 // Función para descargar el flyer
-document.getElementById('descargar-flyer').addEventListener('click', function() {
+document.getElementById('descargar-flyer').addEventListener('click', async function() {
     const flyer = document.getElementById('flyer');
     
     // Mostrar un mensaje de carga
@@ -128,39 +139,52 @@ document.getElementById('descargar-flyer').addEventListener('click', function() 
     btnDescargar.textContent = 'Generando imagen...';
     btnDescargar.disabled = true;
 
-    // Configuración para dom-to-image
-    const options = {
-        width: 1080,
-        height: 1920,
-        style: {
-            transform: 'scale(1)',
-            transformOrigin: 'top left'
-        },
-        quality: 1.0,
-        bgcolor: '#ffffff'
-    };
+    try {
+        // Esperar a que las fuentes se carguen
+        await waitForFonts();
 
-    // Generar la imagen
-    domtoimage.toPng(flyer, options)
-        .then(function(dataUrl) {
-            // Crear el enlace de descarga
-            const link = document.createElement('a');
-            link.download = 'flyer-casa-de-cambio.png';
-            link.href = dataUrl;
-            link.click();
-            
-            // Restaurar el botón
-            btnDescargar.textContent = textoOriginal;
-            btnDescargar.disabled = false;
-        })
-        .catch(function(error) {
-            console.error('Error al generar la imagen:', error);
-            alert('Error al generar la imagen. Por favor, intenta de nuevo.');
-            
-            // Restaurar el botón
-            btnDescargar.textContent = textoOriginal;
-            btnDescargar.disabled = false;
-        });
+        // Clonar el elemento para evitar problemas con las fuentes
+        const clone = flyer.cloneNode(true);
+        document.body.appendChild(clone);
+        clone.style.position = 'absolute';
+        clone.style.left = '-9999px';
+        clone.style.top = '-9999px';
+
+        // Configuración para dom-to-image
+        const options = {
+            width: 1080,
+            height: 1920,
+            style: {
+                transform: 'scale(1)',
+                transformOrigin: 'top left'
+            },
+            quality: 1.0,
+            bgcolor: '#ffffff',
+            filter: (node) => {
+                return (node.tagName !== 'SCRIPT');
+            }
+        };
+
+        // Generar la imagen
+        const dataUrl = await domtoimage.toPng(clone, options);
+        
+        // Eliminar el clon
+        document.body.removeChild(clone);
+        
+        // Crear el enlace de descarga
+        const link = document.createElement('a');
+        link.download = 'flyer-casa-de-cambio.png';
+        link.href = dataUrl;
+        link.click();
+        
+    } catch (error) {
+        console.error('Error al generar la imagen:', error);
+        alert('Error al generar la imagen. Por favor, intenta de nuevo.');
+    } finally {
+        // Restaurar el botón
+        btnDescargar.textContent = textoOriginal;
+        btnDescargar.disabled = false;
+    }
 });
 
 // Al cargar la página, actualiza la fecha del flyer
