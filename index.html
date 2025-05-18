@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=1080, initial-scale=1.0">
+    <meta name="viewport" content="initial-scale=1.0">
     <title>Casa de Cambio</title>    
     <style>
         /* Definir las fuentes locales */
@@ -34,45 +34,55 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="inputs-container">
-        <h2>Calculadora de Tasa</h2>
-        <div class="calc-section">
-            <h3>Venezuela a Brasil</h3>
-            <label>Precio del dólar en bolívares:
-                <input type="number" id="ve-bolivares" step="any">
-            </label>
-            <label>Precio del dólar en reales:
-                <input type="number" id="ve-reales" step="any">
-            </label>
-            <button onclick="calcularTasaVEBR()">Calcular Tasa</button>
-            <span id="tasa-ve-br"></span>
-            <button type="button" id="btn-copiar-ve-br" onclick="copiarTasa('tasa-ve-br')" style="display:none;">Copiar</button>
-        </div>
-        <div class="calc-section">
-            <h3>Brasil a Venezuela</h3>
-            <label>Precio del dólar en bolívares:
-                <input type="number" id="br-bolivares" step="any">
-            </label>
-            <label>Precio del dólar en reales:
-                <input type="number" id="br-reales" step="any">
-            </label>
-            <button onclick="calcularTasaBRVE()">Calcular Tasa</button>
-            <span id="tasa-br-ve"></span>
-            <button type="button" id="btn-copiar-br-ve" onclick="copiarTasa('tasa-br-ve')" style="display:none;">Copiar</button>
-        </div>
-    </div>
-    <div class="flyer-container">
-        <button id="descargar-flyer">Descargar Flyer PNG1</button>
-        <div id="flyer" class="flyer">
-            <img class="flyer-main-image" src="img/main-image-2.png" alt="imagen" crossorigin="anonymous" class="imagen" width="1080" height="1920">
-            <div class="flyer-tasa">
-                <span class="tasa-valor" id="flyer-tasa">18.28</span>
-                <div class="flyer-tasa-icons">
-                    <img class="icon-up" src="img/arrow-up.svg" alt="icono" crossorigin="anonymous">
-                    <img class="icon-down" src="img/arrow-donw.svg" alt="icono" crossorigin="anonymous">
+    <div class="main-container">
+        <div class="inputs-container">
+            <h2>Calculadora de Tasa</h2>
+            <div class="calc-section">
+                <h3>Venezuela a Brasil</h3>
+                <div class="input-box">
+                    <div class="input-group">
+                        <label for="ve-bolivares">Precio del dólar en bolívares</label>
+                        <input type="number" id="ve-bolivares" step="any" placeholder="Ingrese el valor">
+                    </div>
+                    <div class="input-group">
+                        <label for="ve-reales">Precio del dólar en reales</label>
+                        <input type="number" id="ve-reales" step="any" placeholder="Ingrese el valor">
+                    </div>
                 </div>
+                <button onclick="calcularTasaVEBR()">Calcular Tasa</button>
+                <span id="tasa-ve-br"></span>
+                <button type="button" id="btn-copiar-ve-br" onclick="copiarTasa('tasa-ve-br')" style="display:none;">Copiar</button>
             </div>
-            <div class="flyer-date" id="flyer-date">--/--/----</div>
+            <div class="calc-section">
+                <h3>Brasil a Venezuela</h3>
+                <div class="input-box">
+                    <div class="input-group">
+                        <label for="br-bolivares">Precio del dólar en bolívares</label>
+                        <input type="number" id="br-bolivares" step="any" placeholder="Ingrese el valor">
+                    </div>
+                    <div class="input-group">
+                        <label for="br-reales">Precio del dólar en reales</label>
+                        <input type="number" id="br-reales" step="any" placeholder="Ingrese el valor">
+                    </div>
+                </div>
+                <button onclick="calcularTasaBRVE()">Calcular Tasa</button>
+                <span id="tasa-br-ve"></span>
+                <button type="button" id="btn-copiar-br-ve" onclick="copiarTasa('tasa-br-ve')" style="display:none;">Copiar</button>
+            </div>
+        </div>
+        <button id="descargar-flyer">Descargar Flyer PNG</button>
+        <div class="flyer-container">
+            <div id="flyer" class="flyer">
+                <img class="flyer-main-image" src="img/main-image-2.png" alt="imagen" crossorigin="anonymous" class="imagen" width="1080" height="1920">
+                <div class="flyer-tasa">
+                    <span class="tasa-valor" id="flyer-tasa">18.28</span>
+                    <div class="flyer-tasa-icons">
+                        <img class="icon-up" src="img/arrow-up.svg" alt="icono" crossorigin="anonymous">
+                        <img class="icon-down" src="img/arrow-donw.svg" alt="icono" crossorigin="anonymous">
+                    </div>
+                </div>
+                <div class="flyer-date" id="flyer-date">--/--/----</div>
+            </div>
         </div>
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/dom-to-image/2.6.0/dom-to-image.min.js"></script>

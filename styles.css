@@ -6,16 +6,24 @@ body {
     color: #fff;
 }
 
-.inputs-container {
-    max-width: 1080px;
-    margin: 30px auto 0 auto;
-    padding: 20px;
-    background: #181818;
-    border-radius: 16px;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+.main-container{
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    align-items: center;
+}
+
+.inputs-container {
+    max-width: 1080px;
+    width: 100%;
+    margin: 0px auto 0 auto;
+    padding: 20px;
+    box-sizing: border-box;
+    background: #181818;
+    border-radius: 16px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
 }
 .inputs-container h2 {
     color: #FFC107;
@@ -24,12 +32,12 @@ body {
 .calc-section {
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: 5px;
     flex-wrap: wrap;
 }
 .calc-section h3 {
     color: #fff;
-    margin-right: 10px;
+    margin: 0px;
     min-width: 180px;
 }
 .calc-section label {
@@ -40,8 +48,7 @@ body {
     padding: 6px 10px;
     border-radius: 6px;
     border: 1px solid #ccc;
-    margin-left: 5px;
-    width: 120px;
+    width: 100%;
 }
 .calc-section button {
     background: #FFC107;
@@ -59,10 +66,12 @@ body {
 .calc-section span {
     font-weight: bold;
     color: #FFC107;
-    margin-left: 10px;
 }
 
 .flyer-container {
+    width: 100px;
+    height: 100px;
+    overflow: auto;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -72,7 +81,6 @@ body {
     width: 1080px;
     height: 1920px;
     position: relative;
-    overflow: hidden;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -144,6 +152,7 @@ body {
 }
 
 #descargar-flyer {
+    margin-top: 30px;
     margin-bottom: 30px;
     background: #FFC107;
     color: #222;
@@ -193,4 +202,49 @@ body {
 
 .btn-historial.btn-limpiar:hover {
     background: #c82333;
+}
+
+.input-box {
+    width: 100%;
+    background-color: #f5f5f5;
+    border-radius: 8px;
+    padding: 15px;
+    box-sizing: border-box;
+    margin: 10px 0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.input-group {
+    margin-bottom: 15px;
+}
+
+.input-group:last-child {
+    margin-bottom: 0;
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 5px;
+    color: #333;
+    font-weight: 500;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 8px 12px;
+    box-sizing: border-box;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 16px;
+    transition: border-color 0.3s ease;
+}
+
+.input-group input:focus {
+    outline: none;
+    border-color: #4a90e2;
+    box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
+}
+
+.input-group input::placeholder {
+    color: #999;
 }
