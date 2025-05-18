@@ -3,28 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=1080, initial-scale=1.0">
-    <title>Casa de Cambio</title>
-    <!-- Precargar las fuentes -->
-    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300;1,400;1,500;1,600;1,700;1,800&display=swap" as="style">
-    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Oswald:wght@200;300;400;500;600;700&display=swap" as="style">
-    
-    <!-- Cargar las fuentes -->
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300;1,400;1,500;1,600;1,700;1,800&display=swap">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Oswald:wght@200;300;400;500;600;700&display=swap">
-    
+    <title>Casa de Cambio</title>    
     <style>
-        /* Definir las fuentes localmente como fallback */
+        /* Definir las fuentes locales */
         @font-face {
             font-family: 'Open Sans';
             font-style: normal;
             font-weight: 400;
-            src: local('Open Sans Regular'), local('OpenSans-Regular');
+            src: url('fonts/OpenSans-Regular.ttf') format('truetype');
+        }
+        @font-face {
+            font-family: 'Open Sans';
+            font-style: normal;
+            font-weight: 700;
+            src: url('fonts/OpenSans-Bold.ttf') format('truetype');
         }
         @font-face {
             font-family: 'Oswald';
             font-style: normal;
             font-weight: 400;
-            src: local('Oswald Regular'), local('Oswald-Regular');
+            src: url('fonts/Oswald-Regular.ttf') format('truetype');
+        }
+        @font-face {
+            font-family: 'Oswald';
+            font-style: normal;
+            font-weight: 700;
+            src: url('fonts/Oswald-Bold.ttf') format('truetype');
         }
         
         /* Aplicar las fuentes */
