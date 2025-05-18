@@ -72,6 +72,16 @@ function actualizarFlyer(tasa, tipo) {
     document.getElementById('flyer-date').textContent = fecha;
 }
 
+// Función para obtener la URL base de GitHub Pages
+function getBaseUrl() {
+    // Si estamos en GitHub Pages, usa la URL del repositorio
+    if (window.location.hostname.includes('github.io')) {
+        return window.location.origin + window.location.pathname.split('/').slice(0, -1).join('/');
+    }
+    // Si estamos en local, usa la ruta relativa
+    return '';
+}
+
 // Descargar flyer como PNG usando html2canvas
 // Debes agregar html2canvas en tu proyecto para que funcione
 document.getElementById('descargar-flyer').addEventListener('click', function() {
@@ -84,6 +94,7 @@ document.getElementById('descargar-flyer').addEventListener('click', function() 
     const images = flyer.getElementsByTagName('img');
     let loadedImages = 0;
     const totalImages = images.length;
+    const baseUrl = getBaseUrl();
 
     // Función para verificar si todas las imágenes están cargadas
     function checkAllImagesLoaded() {
@@ -99,32 +110,40 @@ document.getElementById('descargar-flyer').addEventListener('click', function() 
             scale: 2,
             useCORS: true,
             allowTaint: true,
-            foreignObjectRendering: true,
-            imageTimeout: 0,
-            logging: true,
+            backgroundColor: null,
+            removeContainer: true,
+            foreignObjectRendering: false,
+            imageTimeout: 15000,
+            logging: false,
             onclone: function(clonedDoc) {
                 const images = clonedDoc.getElementsByTagName('img');
                 Array.from(images).forEach(img => {
-                    // Asegurarse de que las imágenes usen rutas absolutas
-                    if (img.src.startsWith('file://')) {
-                        const relativePath = img.getAttribute('src');
-                        img.src = window.location.origin + '/' + relativePath.replace('./', '');
+                    const src = img.getAttribute('src');
+                    if (src.startsWith('./') || src.startsWith('img/')) {
+                        img.src = baseUrl + '/' + src.replace('./', '');
                     }
+                    // Forzar la recarga de la imagen
+                    img.crossOrigin = 'anonymous';
                 });
             }
         }).then(function(canvas) {
             try {
-                const link = document.createElement('a');
-                link.download = 'flyer-casa-de-cambio.png';
-                link.href = canvas.toDataURL('image/png');
-                link.click();
+                // Esperar un momento para asegurar que el canvas esté listo
+                setTimeout(() => {
+                    const link = document.createElement('a');
+                    link.download = 'flyer-casa-de-cambio.png';
+                    link.href = canvas.toDataURL('image/png', 1.0);
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                }, 100);
             } catch (error) {
-                alert('Error al generar la imagen. Por favor, asegúrate de que todas las imágenes estén cargadas correctamente.');
-                console.error('Error:', error);
+                console.error('Error al generar la imagen:', error);
+                alert('Error al generar la imagen. Por favor, intenta de nuevo.');
             }
         }).catch(function(error) {
+            console.error('Error en html2canvas:', error);
             alert('Error al generar el canvas. Por favor, intenta de nuevo.');
-            console.error('Error:', error);
         });
     }
 
