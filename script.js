@@ -118,72 +118,88 @@ async function getBase64Image(img) {
     }
 }
 
-// Función para esperar a que las fuentes se carguen
-function waitForFonts() {
-    return new Promise((resolve) => {
-        if (document.fonts.status === 'loaded') {
-            resolve();
-        } else {
-            document.fonts.ready.then(resolve);
-        }
-    });
-}
-
 // Función para descargar el flyer
 document.getElementById('descargar-flyer').addEventListener('click', async function() {
-    const flyer = document.getElementById('flyer');
-    
-    // Mostrar un mensaje de carga
-    const btnDescargar = document.getElementById('descargar-flyer');
-    const textoOriginal = btnDescargar.textContent;
-    btnDescargar.textContent = 'Generando imagen...';
-    btnDescargar.disabled = true;
-
     try {
-        // Esperar a que las fuentes se carguen
-        await waitForFonts();
-
-        // Clonar el elemento para evitar problemas con las fuentes
-        const clone = flyer.cloneNode(true);
-        document.body.appendChild(clone);
-        clone.style.position = 'absolute';
-        clone.style.left = '-9999px';
-        clone.style.top = '-9999px';
-
-        // Configuración para dom-to-image
-        const options = {
-            width: 1080,
-            height: 1920,
-            style: {
-                transform: 'scale(1)',
-                transformOrigin: 'top left'
-            },
-            quality: 1.0,
-            bgcolor: '#ffffff',
-            filter: (node) => {
-                return (node.tagName !== 'SCRIPT');
-            }
-        };
-
-        // Generar la imagen
-        const dataUrl = await domtoimage.toPng(clone, options);
+        const flyer = document.getElementById('flyer');
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
         
-        // Eliminar el clon
-        document.body.removeChild(clone);
+        // Establecer dimensiones del canvas
+        canvas.width = 1080;
+        canvas.height = 1920;
         
-        // Crear el enlace de descarga
+        // Obtener todas las imágenes del flyer
+        const images = Array.from(flyer.getElementsByTagName('img'));
+        
+        // Cargar todas las imágenes primero
+        const loadedImages = await Promise.all(
+            images.map(img => loadImage(img.getAttribute('src')))
+        );
+        
+        // Dibujar el fondo blanco
+        ctx.fillStyle = 'white';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        // Dibujar cada imagen en su posición
+        loadedImages.forEach((img, index) => {
+            const originalImg = images[index];
+            const rect = originalImg.getBoundingClientRect();
+            const flyerRect = flyer.getBoundingClientRect();
+            
+            // Calcular la posición relativa
+            const x = (rect.left - flyerRect.left) * (canvas.width / flyerRect.width);
+            const y = (rect.top - flyerRect.top) * (canvas.height / flyerRect.height);
+            const width = rect.width * (canvas.width / flyerRect.width);
+            const height = rect.height * (canvas.height / flyerRect.height);
+            
+            ctx.drawImage(img, x, y, width, height);
+        });
+        
+        // Cargar las fuentes antes de dibujar el texto
+        const openSansBold = new FontFace('Open Sans', 'url(fonts/OpenSans-Bold.ttf)', { weight: '700' });
+        const oswaldBold = new FontFace('Oswald', 'url(fonts/Oswald-Bold.ttf)', { weight: '700' });
+        
+        await Promise.all([openSansBold.load(), oswaldBold.load()]);
+        document.fonts.add(openSansBold);
+        document.fonts.add(oswaldBold);
+        
+        // Dibujar el texto de la tasa
+        const tasa = document.getElementById('flyer-tasa');
+        const tasaRect = tasa.getBoundingClientRect();
+        const flyerRect = flyer.getBoundingClientRect();
+        
+        ctx.font = 'bold 48px Oswald';
+        ctx.fillStyle = 'black';
+        ctx.textAlign = 'center';
+        ctx.fillText(
+            tasa.textContent,
+            canvas.width / 2,
+            (tasaRect.top - flyerRect.top) * (canvas.height / flyerRect.height) + 48
+        );
+        
+        // Dibujar la fecha
+        const fecha = document.getElementById('flyer-date');
+        const fechaRect = fecha.getBoundingClientRect();
+        
+        ctx.font = '24px Open Sans';
+        ctx.fillText(
+            fecha.textContent,
+            canvas.width / 2,
+            (fechaRect.top - flyerRect.top) * (canvas.height / flyerRect.height) + 24
+        );
+        
+        // Descargar el canvas como PNG
         const link = document.createElement('a');
         link.download = 'flyer-casa-de-cambio.png';
-        link.href = dataUrl;
+        link.href = canvas.toDataURL('image/png');
+        document.body.appendChild(link);
         link.click();
+        document.body.removeChild(link);
         
     } catch (error) {
-        console.error('Error al generar la imagen:', error);
-        alert('Error al generar la imagen. Por favor, intenta de nuevo.');
-    } finally {
-        // Restaurar el botón
-        btnDescargar.textContent = textoOriginal;
-        btnDescargar.disabled = false;
+        console.error('Error al generar el flyer:', error);
+        alert('Error al generar el flyer. Por favor, asegúrate de que todas las imágenes estén disponibles y accesibles.');
     }
 });
 
