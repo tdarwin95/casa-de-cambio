@@ -146,12 +146,93 @@ document.addEventListener('DOMContentLoaded', function() {
     document.querySelector('.inputs-container').appendChild(contenedorBotones);
 });
 
+// Función para obtener la ruta base de las imágenes
+function getImageBasePath() {
+    // Obtener la ruta base del documento actual
+    const baseUrl = window.location.href.substring(0, window.location.href.lastIndexOf('/') + 1);
+    console.log('URL base detectada:', baseUrl);
+    return baseUrl;
+}
+
+// Función para verificar si una imagen existe
+function verificarImagen(url) {
+    return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => resolve(true);
+        img.onerror = () => resolve(false);
+        img.src = url;
+    });
+}
+
+// Función para precargar imágenes
+async function precargarImagenes() {
+    const basePath = getImageBasePath();
+    const imagenes = [
+        { path: 'img/arrow-up.svg', name: 'arrow-up.svg' },
+        { path: 'img/arrow-donw.svg', name: 'arrow-donw.svg' },
+        { path: 'img/main-image-2.png', name: 'main-image-2.png' }
+    ];
+    
+    console.log('Ruta base de imágenes:', basePath);
+    
+    // Verificar cada imagen
+    for (const img of imagenes) {
+        console.log('Verificando imagen:', img.path);
+        
+        const existe = await verificarImagen(img.path);
+        if (!existe) {
+            throw new Error(`No se pudo encontrar la imagen: ${img.name}`);
+        }
+    }
+    
+    // Si todas las imágenes existen, proceder con la precarga
+    return Promise.all(imagenes.map(img => {
+        return new Promise((resolve, reject) => {
+            const image = new Image();
+            image.crossOrigin = 'anonymous';
+            
+            image.onload = () => {
+                console.log(`Imagen cargada exitosamente: ${img.name}`);
+                resolve(image);
+            };
+            
+            image.onerror = () => {
+                console.error(`Error al cargar la imagen: ${img.name}`);
+                reject(new Error(`No se pudo cargar la imagen: ${img.name}`));
+            };
+            
+            image.src = img.path;
+        });
+    }));
+}
+
 // Función para descargar el flyer como PNG
 function descargarFlyer() {
     const flyer = document.getElementById('flyer');
     const fecha = new Date().toLocaleDateString('es-ES').replace(/\//g, '-');
     
-    domtoimage.toPng(flyer)
+    // Mostrar un mensaje de carga
+    const btnDescargar = document.getElementById('descargar-flyer');
+    const textoOriginal = btnDescargar.textContent;
+    btnDescargar.textContent = 'Generando flyer...';
+    btnDescargar.disabled = true;
+    
+    // Precargar imágenes antes de generar el PNG
+    precargarImagenes()
+        .then(() => {
+            console.log('Todas las imágenes precargadas correctamente');
+            return domtoimage.toPng(flyer, {
+                quality: 1.0,
+                bgcolor: '#ffffff',
+                style: {
+                    'transform': 'scale(1)',
+                    'transform-origin': 'top left'
+                },
+                filter: (node) => {
+                    return (node.tagName !== 'IMG' || node.complete);
+                }
+            });
+        })
         .then(function (dataUrl) {
             const link = document.createElement('a');
             link.download = `flyer-${fecha}.png`;
@@ -160,7 +241,12 @@ function descargarFlyer() {
         })
         .catch(function (error) {
             console.error('Error al generar el flyer:', error);
-            alert('Hubo un error al generar el flyer. Por favor, intente nuevamente.');
+            alert('Hubo un error al generar el flyer: ' + error.message);
+        })
+        .finally(() => {
+            // Restaurar el botón
+            btnDescargar.textContent = textoOriginal;
+            btnDescargar.disabled = false;
         });
 }
 
