@@ -81,32 +81,69 @@ document.getElementById('descargar-flyer').addEventListener('click', function() 
     }
     
     const flyer = document.getElementById('flyer');
-    html2canvas(flyer, {
-        scale: 2,
-        useCORS: true,
-        allowTaint: true,
-        foreignObjectRendering: true,
-        imageTimeout: 0,
-        logging: true,
-        onclone: function(clonedDoc) {
-            const images = clonedDoc.getElementsByTagName('img');
-            Array.from(images).forEach(img => {
-                img.crossOrigin = 'anonymous';
-            });
+    const images = flyer.getElementsByTagName('img');
+    let loadedImages = 0;
+    const totalImages = images.length;
+
+    // Función para verificar si todas las imágenes están cargadas
+    function checkAllImagesLoaded() {
+        loadedImages++;
+        if (loadedImages === totalImages) {
+            generateCanvas();
         }
-    }).then(function(canvas) {
-        try {
-            const link = document.createElement('a');
-            link.download = 'flyer-casa-de-cambio.png';
-            link.href = canvas.toDataURL('image/png');
-            link.click();
-        } catch (error) {
-            alert('Error al generar la imagen. Por favor, intenta de nuevo.');
+    }
+
+    // Función para generar el canvas y descargar
+    function generateCanvas() {
+        html2canvas(flyer, {
+            scale: 2,
+            useCORS: true,
+            allowTaint: true,
+            foreignObjectRendering: true,
+            imageTimeout: 0,
+            logging: true,
+            onclone: function(clonedDoc) {
+                const images = clonedDoc.getElementsByTagName('img');
+                Array.from(images).forEach(img => {
+                    // Asegurarse de que las imágenes usen rutas absolutas
+                    if (img.src.startsWith('file://')) {
+                        const relativePath = img.getAttribute('src');
+                        img.src = window.location.origin + '/' + relativePath.replace('./', '');
+                    }
+                });
+            }
+        }).then(function(canvas) {
+            try {
+                const link = document.createElement('a');
+                link.download = 'flyer-casa-de-cambio.png';
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            } catch (error) {
+                alert('Error al generar la imagen. Por favor, asegúrate de que todas las imágenes estén cargadas correctamente.');
+                console.error('Error:', error);
+            }
+        }).catch(function(error) {
+            alert('Error al generar el canvas. Por favor, intenta de nuevo.');
             console.error('Error:', error);
+        });
+    }
+
+    // Verificar si hay imágenes
+    if (totalImages === 0) {
+        generateCanvas();
+        return;
+    }
+
+    // Verificar el estado de carga de cada imagen
+    Array.from(images).forEach(img => {
+        if (img.complete) {
+            checkAllImagesLoaded();
+        } else {
+            img.onload = checkAllImagesLoaded;
+            img.onerror = function() {
+                alert('Error al cargar una o más imágenes. Por favor, verifica que todas las imágenes estén disponibles.');
+            };
         }
-    }).catch(function(error) {
-        alert('Error al generar el canvas. Por favor, intenta de nuevo.');
-        console.error('Error:', error);
     });
 });
 
