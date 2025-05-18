@@ -105,8 +105,8 @@ body {
 
 .tasa-valor{
     font-size: 128px;
-    line-height: 1;
-    font-family: Oswald;
+    line-height: normal;
+    font-family: sans-serif;
     font-weight: 700;
     color: #FFF;
 }
@@ -133,7 +133,7 @@ body {
 .flyer-date{
     font-size: 38px;
     line-height: 1;
-    font-family: Open Sans;
+    font-family: cursive;
     font-weight: 700;
     color: #FFF;
 
